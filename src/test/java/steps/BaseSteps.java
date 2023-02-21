@@ -15,10 +15,9 @@ public class BaseSteps {
         driver = Driver.getDriver();
     }
 
-    @Given("user navigates to {string}")
-    public void userNavigatesTo(String url) {
-        System.out.println(url);
+    @Given("user is on {string}")
+    public void user_is_on(String url) {
+        // Write code here that turns the phrase above into concrete actions
         driver.get(url);
-
     }
 }

@@ -2,149 +2,142 @@ package steps;
 
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import gherkin.ast.DataTable;
 import org.junit.Assert;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
-import pages.TechGlobalAlertsPage;
-import pages.TechGlobalDynamicTablesPage;
+import org.openqa.selenium.interactions.Actions;
 import pages.TechGlobalFrontendTestingHomePage;
-import pages.TechGlobalLoginFormPage;
-import utils.AlertHandler;
+import pages.TechGlobalPagination;
 import utils.Driver;
 import utils.Waiter;
+
 
 public class TechGlobalSteps {
 
 
     WebDriver driver;
     TechGlobalFrontendTestingHomePage techGlobalFrontendTestingHomePage;
-    TechGlobalDynamicTablesPage techGlobalDynamicTablesPage;
-    TechGlobalAlertsPage techGlobalAlertsPage;
-    TechGlobalLoginFormPage techGlobalLoginFormPage;
+    Actions action;
+    TechGlobalPagination techGlobalPagination;
+
+
 
     @Before
     public void setup() {
         driver = Driver.getDriver();
         techGlobalFrontendTestingHomePage = new TechGlobalFrontendTestingHomePage();
-        techGlobalDynamicTablesPage = new TechGlobalDynamicTablesPage();
-        techGlobalAlertsPage = new TechGlobalAlertsPage();
-        techGlobalLoginFormPage = new TechGlobalLoginFormPage();
+        action = new Actions(driver);
+        techGlobalPagination = new TechGlobalPagination();
+    }
+    @When("user moves to {string} header dropdown")
+    public void user_moves_to_header_dropdown(String string) {
+        action.moveToElement(techGlobalFrontendTestingHomePage.headerDropdown).perform();
     }
 
-    @When("user clicks on Practices dropdown in the header")
-    public void userClicksOnPracticesDropdownInTheHeader() {
-        techGlobalFrontendTestingHomePage.headerDropdown.click();
+    @When("user clicks on {string} header dropdown option")
+    public void user_clicks_on_header_dropdown_option(String string) {
+        techGlobalFrontendTestingHomePage.getFrontendTestingPage();
     }
 
-    @And("user selects the {string} option")
-    public void userSelectsTheOption(String option) {
-        switch (option) {
-            case "Frontend Testing":
-                techGlobalFrontendTestingHomePage.headerDropdownOptions.get(0).click();
-                break;
-            case "Dynamic Tables":
-            case "Alerts":
-            case "Login Form":
-                techGlobalFrontendTestingHomePage.clickOnCard(option);
-                break;
-            default:
-                throw new NotFoundException();
-        }
+    @Then("user should be navigated to {string}")
+    public void user_should_be_navigated_to(String url) {
+        Assert.assertEquals(url, driver.getCurrentUrl());
     }
 
-    @Then("user should see {string} heading")
-    public void userShouldSeeHeading(String headerText) {
-        switch (headerText) {
-            case "Dynamic Tables":
-                Assert.assertEquals(headerText, techGlobalDynamicTablesPage.headingText.getText());
+    @And("user clicks on {string} card")
+    public void user_clicks_on_card(String string) {
+        techGlobalFrontendTestingHomePage.clickOnCard("Pagination");
+
+    }
+
+    @And("user should see {string} heading")
+    public void user_should_see_heading(String heading) {
+        switch (heading){
+            case "Pagination":
+                Assert.assertEquals(heading,techGlobalPagination.mainHeading.getText());
                 break;
-            case "Alerts":
-                Assert.assertEquals(headerText, techGlobalAlertsPage.headingText.getText());
-                break;
-            case "Login Form":
-                Assert.assertEquals(headerText, techGlobalLoginFormPage.headingText.getText());
+            case "World City Populations 2022":
+                Assert.assertEquals(heading, techGlobalPagination.subHeading.getText());
                 break;
             default:
-                throw new NotFoundException("The heading text is not defined!");
+               throw new NotFoundException("Heading Text Not Found");
+        }
+
+    }
+
+    @And("user should see {string} paragraph")
+    public void user_should_see_paragraph(String paragraph) {
+        Assert.assertEquals(paragraph, techGlobalPagination.paragraph.getText());
+    }
+
+
+
+    @And("user should see “Previous” button is disabled")
+    public void user_should_see_Previous_button_is_disabled() {
+        Assert.assertFalse(techGlobalPagination.previousBtn.isEnabled());
+
+    }
+
+    @And("user should see “Next” button is enabled")
+    public void user_should_see_Next_button_is_enabled(){
+        Assert.assertTrue(techGlobalPagination.nextBtn.isEnabled());
+    }
+
+    @When("user clicks on “Next” button")
+    public void user_clicks_on_Next_button() {
+        techGlobalPagination.nextBtn.click();
+    }
+
+    @Then("user should see “Previous” button is enabled")
+    public void user_should_see_Previous_button_is_enabled() {
+        Assert.assertTrue(techGlobalPagination.previousBtn.isEnabled());
+    }
+
+    @And("user clicks on “Next” button till it becomes disabled")
+    public void user_clicks_on_Next_button_till_it_becomes_disabled() {
+        while (techGlobalPagination.nextBtn.isEnabled()) {
+            techGlobalPagination.nextBtn.click();
         }
     }
 
-    @When("user clicks the {string} button")
-    public void userClicksTheButton(String argument) {
-        switch (argument) {
-            case "ADD PRODUCT":
-                techGlobalDynamicTablesPage.addProductButton.click();
-                break;
-            case "CLOSE":
-                techGlobalDynamicTablesPage.closeButton.click();
-                break;
-            default:
-                throw new NotFoundException("The button text is not defined properly in the feature file");
+    @And("user should see “Next” button is disabled")
+    public void user_should_see_Next_button_is_disabled() {
+        Assert.assertFalse(techGlobalPagination.nextBtn.isEnabled());
+    }
+
+
+
+
+    @And("user should see “Tokyo” city with info below and an image")
+    public void user_should_see_Tokyo_city_with_info_below_and_an_image(DataTable dataTable) {
+        for (int i = 0; i < techGlobalPagination.cityInfo.size(); i++) {
+            Assert.assertEquals(,techGlobalPagination.cityInfo.get(i).getText());
         }
     }
 
-    @Then("validate {string} pop-up is displayed")
-    public void validatePopUpIsDisplayed(String popup) {
-        Assert.assertEquals(popup, techGlobalDynamicTablesPage.modalCardTitle.getText());
+    @And("user should see “Delhi” city with info below and an image")
+    public void user_should_see_Delhi_city_with_info_below_and_an_image(io.cucumber.datatable.DataTable dataTable) {
+
     }
 
-    @Then("user should not see Add New Product pop-up")
-    public void userShouldNotSeeAddNewProductPopUp() {
-        try {
-            Assert.assertFalse(techGlobalDynamicTablesPage.modalCardTitle.isDisplayed());
-        } catch (NoSuchElementException e) {
-            Assert.assertTrue(true);
-        }
+    @And("user should see “Shangai” city with info below and an image")
+    public void user_should_see_Shangai_city_with_info_below_and_an_image(io.cucumber.datatable.DataTable dataTable) {
+
     }
 
+    @And("user should see “Sao Paulo” city with info below and an image")
+    public void user_should_see_Sao_Paulo_city_with_info_below_and_an_image(io.cucumber.datatable.DataTable dataTable) {
 
-    @And("user should see buttons as {string}, {string}, and {string}")
-    public void userShouldSeeButtonsAsAnd(String alert1, String alert2, String alert3) {
-        Assert.assertEquals(alert1, techGlobalAlertsPage.alertButtons.get(0).getText());
-        Assert.assertEquals(alert2, techGlobalAlertsPage.alertButtons.get(1).getText());
-        Assert.assertEquals(alert3, techGlobalAlertsPage.alertButtons.get(2).getText());
     }
 
-    @And("user should see {string} text")
-    public void userShouldSeeText(String resulText) {
-        Assert.assertEquals(resulText, techGlobalAlertsPage.resultTitle.getText());
+    @And("user should see “Mexico City” city with info below and an image")
+    public void user_should_see_Mexico_City_city_with_info_below_and_an_image(io.cucumber.datatable.DataTable dataTable) {
+
+
     }
 
-    @When("user clicks on {string} box")
-    public void userClicksOnBox(String alertButton) {
-        techGlobalAlertsPage.clickOnAlert(alertButton);
-    }
-
-    @Then("user should see a popup displaying message {string}")
-    public void userShouldSeeAPopupDisplayingMessage(String alertMessage) {
-        Waiter.pause(2);
-        Assert.assertEquals(alertMessage, AlertHandler.getAlertText());
-        Waiter.pause(2);
-        AlertHandler.acceptAlert();
-    }
-
-    @When("user enters username as {string} and password as {string}")
-    public void userEntersUsernameAsAndPasswordAs(String username, String password) {
-        techGlobalLoginFormPage.usernameInput.sendKeys(username);
-        techGlobalLoginFormPage.passwordInput.sendKeys(password);
-        techGlobalLoginFormPage.loginButton.click();
-    }
-
-    @Then("user should see a {string} message")
-    public void userShouldSeeAMessage(String errorMessage) {
-        switch (errorMessage) {
-            case "Invalid Username entered!":
-            case "Invalid Password entered!":
-                Assert.assertEquals(errorMessage, techGlobalLoginFormPage.errorText.getText());
-                break;
-            case "You are logged in":
-                Assert.assertEquals(errorMessage, techGlobalLoginFormPage.successLoginText.getText());
-                break;
-            default:
-                throw new NotFoundException("The error message is not defined properly in the feature file");
-        }
-    }
 }
